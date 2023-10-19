@@ -4,70 +4,42 @@ module PDF
   INCH = 72
   MM   = INCH / 25.4
 
-  class Writer
-    HEADER = "%PDF-1.7\n%\xe2\x93\x82\xe2\x93\x81\xe2\x93\x85\n"
+  CARD_WIDTH  = 63 * MM
+  CARD_HEIGHT = 88 * MM
+  CARD_MARGIN = 1 # px
 
-    def initialize
-      @current_offset = 0
-      @object_offsets = {}
-      @output_buffer  = StringIO.new
-
-      write(HEADER)
+  # @param page_size [Symbol]
+  # @return [(Integer, Integer)]
+  def self.cards_per_page(page_size)
+    _, _, width, height = HexaPDF::Type::Page::PAPER_SIZE.fetch(page_size) do
+      raise ArgumentError, "Unknown page size: #{page_size}."
     end
 
-    def add(number, data)
-      @object_offsets[number] = @current_offset
-      write("#{number} 0 obj\n#{data}\nendobj\n")
-    end
+    # Leave at least 1mm of margin on each side
+    width  -= 2 * MM
+    height -= 2 * MM
 
-    def flush(root)
-      xref_offset = @current_offset
-      write("xref\n")
-      xref_start = 0
-      xref_count = 1
-      xref_section = "0000000000 65536 f \n"
+    # Leave 1px of margin between cards
+    card_width  = CARD_WIDTH + CARD_MARGIN
+    card_height = CARD_HEIGHT + CARD_MARGIN
 
-      @object_offsets.sort.each do |number, offset|
-        if (number != xref_start + xref_count)
-          write("#{xref_start} #{xref_count}\n#{xref_section}")
-          xref_start = 0
-          xref_count = 0
-          xref_section = ""
-        end
-
-        xref_count += 1
-        xref_section += "%010d 00000 n \n" % offset
-      end
-
-      write("#{xref_start} #{xref_count}\n#{xref_section}")
-      xref_size = @object_offsets.size + 1
-      write("trailer\n<< /Size #{xref_size}\n/Root #{root} 0 R\n>>\n")
-      write("startxref\n#{xref_offset}\n%%EOF\n")
-    end
-
-    def to_s
-      @output_buffer.string
-    end
-
-  private
-
-    # @param data [String]
-    # @return [void]
-    def write(data)
-      @current_offset += data.bytesize
-      @output_buffer << data
-    end
+    [(width / card_width).floor, (height / card_height).floor]
   end
 
-  def self.pdf_stream(data, params = nil)
-    length = data.bytesize
-
-    if params
-      dict = "<< #{params}\n/Length #{length}\n>>"
-    else
-      dict = "<< /Length #{length} >>"
+  # @param page_size [Symbol]
+  # @param cards_x [Integer]
+  # @param cards_y [Integer]
+  def self.page_margins(page_size, (cards_x, cards_y))
+    _, _, width, height = HexaPDF::Type::Page::PAPER_SIZE.fetch(page_size) do
+      raise ArgumentError, "Unknown page size: #{page_size}."
     end
 
-    "#{dict}\nstream\n#{data}\nendstream\n"
+    cards_width  = cards_x * (CARD_WIDTH + CARD_MARGIN)
+    cards_height = cards_y * (CARD_HEIGHT + CARD_MARGIN)
+
+    margin_top  = (height - cards_height) / 2
+    margin_left = (width - cards_width) / 2
+
+    [margin_top, margin_left]
   end
 end

@@ -3,9 +3,15 @@ GEM
   specs:
     ast (2.4.2)
     base64 (0.1.1)
+    cmdparse (3.0.7)
     diff-lcs (1.5.0)
     fastimage (2.2.7)
     ffi (1.16.3)
+    geom2d (0.4.1)
+    hexapdf (0.33.0)
+      cmdparse (~> 3.0, >= 3.0.3)
+      geom2d (~> 0.4, >= 0.4.1)
+      openssl (>= 2.2.1)
     json (2.6.3)
     language_server-protocol (3.17.0.3)
     listen (3.8.0)
@@ -15,6 +21,7 @@ GEM
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
     nio4r (2.5.9)
+    openssl (3.2.0)
     parallel (1.23.0)
     parser (3.2.2.4)
       ast (~> 2.4.1)
@@ -90,6 +97,7 @@ PLATFORMS
 
 DEPENDENCIES
   fastimage
+  hexapdf
   mini_magick
   puma
   rackup
