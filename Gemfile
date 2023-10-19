@@ -3,6 +3,7 @@
 source 'https://rubygems.org'
 ruby '3.2.2'
 
+gem 'fastimage'
 gem 'puma'
 gem 'rackup', require: false
 gem 'sinatra'

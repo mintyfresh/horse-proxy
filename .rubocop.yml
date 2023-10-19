@@ -1,0 +1,16 @@
+require:
+  - rubocop-performance
+  - rubocop-rspec
+
+AllCops:
+  DefaultFormatter: progress
+  DisplayCopNames: true
+  ExtraDetails: true
+  NewCops: enable
+  TargetRubyVersion: 3.2
+
+Layout/AccessModifierIndentation:
+  EnforcedStyle: outdent
+
+Style/Documentation:
+  Enabled: false
