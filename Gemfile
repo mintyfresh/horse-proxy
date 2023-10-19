@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 ruby '3.2.2'
 
 gem 'fastimage'
+gem 'mini_magick'
 gem 'puma'
 gem 'rackup', require: false
 gem 'sinatra'

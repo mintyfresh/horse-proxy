@@ -15,25 +15,16 @@ get '/' do
 end
 
 get '/print-and-play' do
-  deck = Ponyhead.parse_ponyhead_url(params[:deck])
+  deck = Ponyhead.parse_decklist_url(params[:deck])
 
   logger.info "Scanning #{deck.count} cards for images..."
 
   images = deck.flat_map do |card, count|
     images = []
 
-    path = PrintAndPlay.image_path(card)
-    logger.info "Scanning #{path}..."
-
-    if (size = FastImage.size(path))
-      images << [card, path, count, size]
-    end
-
-    path = PrintAndPlay.image_path("#{card}b")
-    logger.info "Scanning #{path} for 2nd face..."
-
-    if (size = FastImage.size(path))
-      images << [card, path, count, size]
+    metadata = Ponyhead::ImageCache.fetch(card)
+    metadata['paths'].each_with_index do |path, index|
+      images << [card, path, count, metadata['sizes'][index]]
     end
 
     images
@@ -55,14 +46,17 @@ get '/print-and-play' do
 
   all_images = []
 
-  images.each do |card, url, count, (width, height)|
+  images.each do |card, path, count, (width, height)|
     name = "/Im#{card}"
-    data = URI.parse(url).open.read
+    data = path.read
 
     image_on = next_on
     next_on += 1
 
-    writer.add(image_on, PDF.pdf_stream(data, "/Type /XObject\n/Subtype /Image\n/Width #{width}\n/Height #{height}\n/ColorSpace /DeviceRGB\n/BitsPerComponent 8\n/Filter /DCTDecode"))
+    params = "/Type /XObject\n/Subtype /Image\n/Width #{width}\n/Height #{height}\n" \
+             "/ColorSpace /DeviceRGB\n/BitsPerComponent 8\n/Filter /DCTDecode"
+
+    writer.add(image_on, PDF.pdf_stream(data, params))
 
     count.times do
       all_images << [name, image_on]
