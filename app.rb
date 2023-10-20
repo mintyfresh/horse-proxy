@@ -15,7 +15,7 @@ end
 
 get '/generate-pdf' do
   decklist = Ponyhead.parse_decklist_url(params[:deck])
-  images = Ponyhead.extend_decklist_to_images(decklist)
+  image_paths = Ponyhead.convert_decklist_to_image_paths(decklist)
 
   paper_size = params.fetch(:paper_size, :Letter).to_sym
   paper_size = :Letter unless PDF.paper_sizes.key?(paper_size)
@@ -25,10 +25,10 @@ get '/generate-pdf' do
 
   buffer = StringIO.new
   HexaPDF::Composer.create(buffer, page_size: paper_size, margin:) do |composer|
-    images.each do |image|
-      composer.image(image.to_s, width: PDF::CARD_WIDTH, height: PDF::CARD_HEIGHT,
-                                 margin: [0, 0, PDF::CARD_MARGIN, PDF::CARD_MARGIN],
-                                 position: :float)
+    image_paths.each do |path|
+      composer.image(path.to_s, width: PDF::CARD_WIDTH, height: PDF::CARD_HEIGHT,
+                                margin: [0, 0, PDF::CARD_MARGIN, PDF::CARD_MARGIN],
+                                position: :float)
     end
   end
 

@@ -28,7 +28,7 @@ module Ponyhead
 
   # @param decklist [Hash{String => Integer}]
   # @return [Array<String>]
-  def self.extend_decklist_to_images(decklist)
+  def self.convert_decklist_to_image_paths(decklist)
     decklist.flat_map do |card, count|
       metadata = ImageCache.fetch(card)
 
