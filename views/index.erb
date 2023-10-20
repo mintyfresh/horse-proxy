@@ -7,7 +7,7 @@
       <div class="mb-3">
         <label class="form-label" for="paper_size">Paper size</label>
         <select class="form-select" name="paper_size" title="Paper size">
-          <% PDF.paper_sizes.each do |paper_size| %>
+          <% PDF.paper_sizes.each_key do |paper_size| %>
             <option value="<%= paper_size %>" <%= paper_size == :Letter ? 'selected="selected"' : '' %>><%= paper_size %></option>
           <% end %>
         </select>

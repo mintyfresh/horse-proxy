@@ -27,7 +27,8 @@ get '/generate-pdf' do
   HexaPDF::Composer.create(buffer, page_size: paper_size, margin:) do |composer|
     images.each do |image|
       composer.image(image.to_s, width: PDF::CARD_WIDTH, height: PDF::CARD_HEIGHT,
-                                 margin: [0, 0, 1, 1], position: :float)
+                                 margin: [0, 0, PDF::CARD_MARGIN, PDF::CARD_MARGIN],
+                                 position: :float)
     end
   end
 
