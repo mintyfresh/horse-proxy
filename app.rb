@@ -18,7 +18,7 @@ get '/generate-pdf' do
   images = Ponyhead.extend_decklist_to_images(decklist)
 
   paper_size = params.fetch(:paper_size, :Letter).to_sym
-  paper_size = :Letter unless HexaPDF::Type::Page::PAPER_SIZE.key?(paper_size)
+  paper_size = :Letter unless PDF.paper_sizes.key?(paper_size)
 
   cards_per_page = PDF.cards_per_page(paper_size)
   margin = PDF.page_margins(paper_size, cards_per_page)
