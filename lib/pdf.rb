@@ -8,16 +8,31 @@ module PDF
   CARD_HEIGHT = 88 * MM
   CARD_MARGIN = 1 # px
 
-  # @param page_size [Symbol]
+  # Minimum 1mm of margin on each side
+  PAGE_MARGIN = 2 * MM
+
+  # Paper sizes that are large enough to fit at least one card and have at least 1mm of margin on each side
+  #
+  # @return [Array<Symbol>]
+  def self.paper_sizes
+    paper_sizes = HexaPDF::Type::Page::PAPER_SIZE.select do |_, (_, _, width, height)|
+      width >= (CARD_WIDTH + CARD_MARGIN + PAGE_MARGIN) &&
+        height >= (CARD_HEIGHT + CARD_MARGIN + PAGE_MARGIN)
+    end
+
+    paper_sizes.keys
+  end
+
+  # @param paper_size [Symbol]
   # @return [(Integer, Integer)]
-  def self.cards_per_page(page_size)
-    _, _, width, height = HexaPDF::Type::Page::PAPER_SIZE.fetch(page_size) do
-      raise ArgumentError, "Unknown page size: #{page_size}."
+  def self.cards_per_page(paper_size)
+    _, _, width, height = HexaPDF::Type::Page::PAPER_SIZE.fetch(paper_size) do
+      raise ArgumentError, "Unknown paper size: #{paper_size}."
     end
 
     # Leave at least 1mm of margin on each side
-    width  -= 2 * MM
-    height -= 2 * MM
+    width  -= PAGE_MARGIN
+    height -= PAGE_MARGIN
 
     # Leave 1px of margin between cards
     card_width  = CARD_WIDTH + CARD_MARGIN
@@ -26,12 +41,12 @@ module PDF
     [(width / card_width).floor, (height / card_height).floor]
   end
 
-  # @param page_size [Symbol]
+  # @param paper_size [Symbol]
   # @param cards_x [Integer]
   # @param cards_y [Integer]
-  def self.page_margins(page_size, (cards_x, cards_y))
-    _, _, width, height = HexaPDF::Type::Page::PAPER_SIZE.fetch(page_size) do
-      raise ArgumentError, "Unknown page size: #{page_size}."
+  def self.page_margins(paper_size, (cards_x, cards_y))
+    _, _, width, height = HexaPDF::Type::Page::PAPER_SIZE.fetch(paper_size) do
+      raise ArgumentError, "Unknown paper size: #{paper_size}."
     end
 
     cards_width  = cards_x * (CARD_WIDTH + CARD_MARGIN)

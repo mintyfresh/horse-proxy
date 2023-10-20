@@ -1,0 +1,25 @@
+<div class="card mt-5">
+  <div class="card-header">
+    <strong>Proxy MLP CCG</strong>
+  </div>
+  <div class="card-body">
+    <form action="/generate-pdf" method="GET">
+      <div class="mb-3">
+        <label class="form-label" for="paper_size">Paper size</label>
+        <select class="form-select" name="paper_size" title="Paper size">
+          <% PDF.paper_sizes.each do |paper_size| %>
+            <option value="<%= paper_size %>" <%= paper_size == :Letter ? 'selected="selected"' : '' %>><%= paper_size %></option>
+          <% end %>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="deck">Ponyhead decklist URL</label>
+        <input type="url" class="form-control" name="deck" title="Ponyhead decklist URL"
+               placeholder="http://www.ponyhead.com/deckbuilder?v1code=..." />
+      </div>
+      <div class="btn-toolbar">
+        <button type="submit" class="btn btn-primary">Generate PDF</button>
+      </div>
+    </form>
+  </div>
+</div>

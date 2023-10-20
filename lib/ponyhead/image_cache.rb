@@ -6,7 +6,7 @@ require 'pathname'
 
 module Ponyhead
   module ImageCache
-    DIR = Pathname.new(File.expand_path('../../tmp/images', __dir__))
+    DIR = APP_ROOT.join('tmp/images').freeze
 
     def self.fetch(card)
       if (metadata = read_cache(card))
